@@ -1,0 +1,122 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+const projects = (await getCollection('projects')).sort(
+	(a, b) => b.data.startDate.valueOf() - a.data.startDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<BaseHead title={`${SITE_TITLE} | Projetos`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				width: 960px;
+			}
+			ul {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+				gap: 1.5rem;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			.card {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				padding: 1.25rem;
+				border-radius: 16px;
+				border: 1px solid rgba(var(--gray), 0.2);
+				background: white;
+				box-shadow: 0 12px 30px rgba(var(--black), 0.08);
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			}
+			.card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 16px 40px rgba(var(--black), 0.12);
+			}
+			.card img {
+				border-radius: 12px;
+			}
+			.card h3 {
+				margin: 0;
+				color: rgb(var(--black));
+			}
+			.card p {
+				margin: 0;
+				color: rgb(var(--gray-dark));
+			}
+			.card .meta {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.35rem;
+				font-size: 0.9rem;
+				color: rgb(var(--gray));
+			}
+			.card .tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.35rem;
+			}
+			.card .tags span {
+				padding: 0.2rem 0.6rem;
+				border-radius: 999px;
+				background: rgba(var(--accent), 10%);
+				font-size: 0.8rem;
+			}
+			.card a {
+				text-decoration: none;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>Projetos</h1>
+			<p>Projetos reais, com resultados claros e próximos passos definidos.</p>
+			<section>
+				<ul>
+					{
+						projects.map((project) => (
+							<li>
+								<a class="card" href={`/projects/${project.id}/`}>
+									{project.data.heroImage && (
+										<img
+											width={640}
+											height={320}
+											src={project.data.heroImage}
+											alt=""
+										/>
+									)}
+									<h3>{project.data.title}</h3>
+									<p>{project.data.description}</p>
+									<div class="meta">
+										<FormattedDate date={project.data.startDate} />
+										{project.data.endDate && (
+											<span>
+												 — <FormattedDate date={project.data.endDate} />
+											</span>
+										)}
+									</div>
+									<div class="tags">
+										{project.data.techStack.slice(0, 3).map((tech) => (
+											<span>{tech}</span>
+										))}
+									</div>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
